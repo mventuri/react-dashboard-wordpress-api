@@ -1,14 +1,11 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
-import Table from 'react-bootstrap/Table'
+import Table from 'react-bootstrap/Table';
 
-class Report extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { countActiveState: 0, countInactiveState: 0, };
-  }
+const Report = () => {
+  const [state, setState] = useState({ countActiveState: 0, countInactiveState: 0, });
 
-  componentDidMount() {
+  useEffect(() => {
     axios.get("<BASE_URL>/wp-json/wp/v2/plugins", {
       auth: {
         username: process.env.REACT_APP_USERNAME,
@@ -16,7 +13,7 @@ class Report extends React.Component {
       }
     })
       .then(({ data: plugins }) => {
-        this.setState({
+        setState({
           countActiveState: plugins.filter(plugin => plugin.status === 'active').length,
           countInactiveState: plugins.filter(plugin => plugin.status !== 'active').length,
         })
@@ -25,30 +22,28 @@ class Report extends React.Component {
         alert("Something went wrong. Try again later.");
         console.log(error);
       })
-  }
+  }, []);
 
-  render() {
-    return (
-      <Table striped bordered hover >
-        <thead>
-          <tr>
-            <th>Status</th>
-            <th>Plugin Amount</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th>Active</th>
-            <td>{this.state.countActiveState}</td>
-          </tr>
-          <tr>
-            <th>Inactive</th>
-            <td>{this.state.countInactiveState}</td>
-          </tr>
-        </tbody>
-      </Table>
-    );
-  }
+  return (
+    <Table striped bordered hover >
+      <thead>
+        <tr>
+          <th>Status</th>
+          <th>Plugin Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>Active</th>
+          <td>{state.countActiveState}</td>
+        </tr>
+        <tr>
+          <th>Inactive</th>
+          <td>{state.countInactiveState}</td>
+        </tr>
+      </tbody>
+    </Table>
+  );
 }
 
 export default Report;
