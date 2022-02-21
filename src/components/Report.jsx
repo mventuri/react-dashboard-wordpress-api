@@ -9,27 +9,17 @@ class Report extends React.Component {
   }
 
   componentDidMount() {
-    let countActive = 0;
-    let countInactive = 0;
-
     axios.get("<BASE_URL>/wp-json/wp/v2/plugins", {
       auth: {
         username: process.env.REACT_APP_USERNAME,
         password: process.env.REACT_APP_CLIENT_SECRET
       }
     })
-      .then(res => {
-        const plugins = res.data;
-        for (let key in plugins) {
-          if (plugins[key].status === "active") {
-            countActive++;
-            this.setState({ countActiveState: countActive });
-          }
-          else {
-            countInactive++;
-            this.setState({ countInactiveState: countInactive });
-          }
-        }
+      .then(({ data: plugins }) => {
+        this.setState({
+          countActiveState: plugins.filter(plugin => plugin.status === 'active').length,
+          countInactiveState: plugins.filter(plugin => plugin.status !== 'active').length,
+        })
       })
       .catch(error => {
         alert("Something went wrong. Try again later.");
